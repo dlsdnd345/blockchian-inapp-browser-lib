@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "BlockchianInappBrowserLib"
 include ':app'
+include ':Inappbrowserlib'
