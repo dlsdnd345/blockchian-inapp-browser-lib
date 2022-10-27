@@ -4,6 +4,8 @@ plugins {
     id 'maven-publish'
 }
 
+group='com.github.dlsdnd345'
+
 android {
     namespace 'co.iw.inappbrowserlib'
     compileSdk 32
