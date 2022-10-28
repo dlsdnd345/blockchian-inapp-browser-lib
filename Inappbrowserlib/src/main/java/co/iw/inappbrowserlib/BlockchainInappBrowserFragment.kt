@@ -71,7 +71,7 @@ class BlockchainInappBrowserFragment : Fragment() {
             webViewClient = BaseWebViewClient()
             setWebContentsDebuggingEnabled(true)
 
-            addJavascriptInterface(BridgeWindowKlaytn(this), "appBridge")
+            addJavascriptInterface(BridgeWindowKlaytn(), "appBridge")
 
             loadUrl(url)
         }

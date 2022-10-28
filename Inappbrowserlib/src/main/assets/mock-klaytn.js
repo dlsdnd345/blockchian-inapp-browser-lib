@@ -20,13 +20,14 @@
     isConnected () {
       return true;
     },
-    sendAsync: async function (payload, error) {
-      return new Promise(async (resolve) => {
+    sendAsync: async function (payload, callback) {
         const str = JSON.stringify(payload);
-
         const receipt = await window.appBridge.sendAsync(str);
-        resolve(receipt);
-      })
+        callback(null, {
+            id: payload.id,
+            jsonrpc: payload.jsonrpc,
+            result: receipt
+        })
     },
     enable: async function () {
       const address = await window.appBridge.enable();
