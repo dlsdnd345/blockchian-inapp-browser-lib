@@ -11,7 +11,7 @@
         <EditText
             android:id="@+id/editUrl"
             android:layout_width="0dp"
-            android:text="https://www.naver.com"
+            android:text="http://stage.favorlet-js.testpage.s3-website.ap-northeast-2.amazonaws.com/"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toStartOf="@+id/btnSearch"
             app:layout_constraintStart_toStartOf="parent"
