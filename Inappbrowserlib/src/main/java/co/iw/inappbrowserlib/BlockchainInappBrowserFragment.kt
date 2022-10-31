@@ -3,6 +3,8 @@ package co.iw.inappbrowserlib
 import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,6 +33,16 @@ class BlockchainInappBrowserFragment : Fragment() {
 
     private lateinit var activity: Activity
     private lateinit var binding: FragmentBlockchainInappBrowserBinding
+
+    private var webViewBridgeListener: BridgeFavorlet.IWebViewBridgeListener? = null
+
+
+    /**
+     * WebViewBridgeManager 리스너 세팅
+     */
+    fun setWebViewBridgeListener(listener: BridgeFavorlet.IWebViewBridgeListener) {
+        webViewBridgeListener = listener
+    }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -78,11 +90,20 @@ class BlockchainInappBrowserFragment : Fragment() {
             webViewClient = BaseWebViewClient()
             setWebContentsDebuggingEnabled(true)
 
-            addJavascriptInterface(BridgeFavorlet(), "favorlet")
+            val bridgeFavorlet = BridgeFavorlet(this)
+            webViewBridgeListener?.let {
+                bridgeFavorlet.setWebViewBridgeListener(it)
+            }
+
+            addJavascriptInterface(bridgeFavorlet, "favorlet")
 
             loadUrl(url)
         }
     }
+
+
+
+
 }
 
 
@@ -122,7 +143,23 @@ private class BaseWebViewClient : WebViewClient() {
 }
 
 
-class BridgeFavorlet() : IBridge {
+class BridgeFavorlet(val webView: WebView) : IBridge {
+
+    private var webViewBridgeListener: IWebViewBridgeListener? = null
+
+    /**
+     * WebViewBridgeManager -> WebFragment 로 이벤트 전달
+     */
+    interface IWebViewBridgeListener {
+        fun webRequest(id: String, action: String, params: String)
+    }
+
+    /**
+     * WebViewBridgeManager 리스너 세팅
+     */
+    fun setWebViewBridgeListener(listener: IWebViewBridgeListener) {
+        webViewBridgeListener = listener
+    }
 
     @JavascriptInterface
     override fun getNetwork(): Number {
@@ -142,20 +179,24 @@ class BridgeFavorlet() : IBridge {
     }
 
     override fun webRequest(id: String, action: String, params: String) {
-
+        webViewBridgeListener?.webRequest(id, action, params)
     }
 
     override fun webRequestCallBack(id: String, action: String, callbackParams: String) {
-
+        Handler(Looper.getMainLooper()).post {
+            Log.d("TAG",">>> nativeRequest, $id $action $callbackParams")
+            webView.loadUrl("javascript:webRequestCallBack('$id', '$action','$callbackParams')")
+        }
     }
 
     override fun nativeRequest(id: String, action: String, params: String) {
-
+        Handler(Looper.getMainLooper()).post {
+            Log.d("TAG",">>> nativeRequest, $id $action $params")
+            webView.loadUrl("javascript:nativeRequest('$id', '$action','$params')")
+        }
     }
 
     override fun nativeRequestCallBack(id: String, action: String, callbackParams: String) {
-        
+        Log.d("TAG",">>> nativeRequestCallBack, $id $action $callbackParams")
     }
-
-
 }
