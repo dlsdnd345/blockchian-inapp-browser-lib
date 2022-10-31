@@ -19,40 +19,48 @@ class BlockchainInappBrowserFragment : Fragment() {
 
     companion object {
 
+        //초기화 함수
         fun newInstance(url: String): BlockchainInappBrowserFragment {
-
             val fragment = BlockchainInappBrowserFragment()
             val bundle = Bundle()
             bundle.putString("URL", url)
             fragment.arguments = bundle
-
             return fragment
         }
     }
 
     private lateinit var activity: Activity
-
     private lateinit var binding: FragmentBlockchainInappBrowserBinding
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentBlockchainInappBrowserBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         this.activity = getActivity() as Activity
+
         init()
     }
 
+
+    /*
+     * 데이터 초기화
+     */
     private fun init() {
 
         val url = arguments?.getString("URL")!!
+        //웹뷰 셋팅
         initWebViewSetting(url)
     }
 
 
+    /*
+     * 웹뷰 셋팅 초기화
+     */
     private fun initWebViewSetting(url: String) {
 
         with(binding.webView) {
@@ -67,11 +75,10 @@ class BlockchainInappBrowserFragment : Fragment() {
             settings.useWideViewPort = true
             settings.loadWithOverviewMode = true
             settings.loadsImagesAutomatically = true
-            webChromeClient = BaseWebChromeClient()
             webViewClient = BaseWebViewClient()
             setWebContentsDebuggingEnabled(true)
 
-            addJavascriptInterface(BridgeWindowKlaytn(), "appBridge")
+            addJavascriptInterface(BridgeFavorlet(), "favorlet")
 
             loadUrl(url)
         }
@@ -83,7 +90,7 @@ private class BaseWebViewClient : WebViewClient() {
 
     private fun injectJS(webView: WebView) {
         try {
-            val inputStream: InputStream = webView.context.assets.open("mock-klaytn.js")
+            val inputStream: InputStream = webView.context.assets.open("app-to-app-klaytn.js")
             val buffer = ByteArray(inputStream.available())
             inputStream.read(buffer)
             inputStream.close()
@@ -115,12 +122,7 @@ private class BaseWebViewClient : WebViewClient() {
 }
 
 
-private class BaseWebChromeClient : WebChromeClient() {
-
-}
-
-
-class BridgeWindowKlaytn() : IBridgeKlaytn {
+class BridgeFavorlet() : IBridge {
 
     @JavascriptInterface
     override fun getNetwork(): Number {
@@ -137,6 +139,22 @@ class BridgeWindowKlaytn() : IBridgeKlaytn {
     override fun sendAsync(payload: String): String {
         Log.i("TAG","!!!!!!!!!!!!!!!!! payload $payload")
         return "0x7aa154d5c667dd46c59e4c76184669b79f5d39f5b5c0bddeeb3e68de0f0687a319a7911b94452649c1deaeda7b919a7eff4bcf1530d1f9930fe5f8754a88c3211b"
+    }
+
+    override fun webRequest(id: String, action: String, params: String) {
+
+    }
+
+    override fun webRequestCallBack(id: String, action: String, callbackParams: String) {
+
+    }
+
+    override fun nativeRequest(id: String, action: String, params: String) {
+
+    }
+
+    override fun nativeRequestCallBack(id: String, action: String, callbackParams: String) {
+        
     }
 
 

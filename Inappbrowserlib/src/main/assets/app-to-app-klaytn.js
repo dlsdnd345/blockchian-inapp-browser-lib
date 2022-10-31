@@ -22,7 +22,7 @@
     },
     sendAsync: async function (payload, callback) {
         const str = JSON.stringify(payload);
-        const receipt = await window.appBridge.sendAsync(str);
+        const receipt = await window.favorlet.sendAsync(str);
         callback(null, {
             id: payload.id,
             jsonrpc: payload.jsonrpc,
@@ -30,8 +30,8 @@
         })
     },
     enable: async function () {
-      const address = await window.appBridge.enable();
-      const network = await window.appBridge.getNetwork();
+      const address = await window.favorlet.enable();
+      const network = await window.favorlet.getNetwork();
       console.log("enable return: ", address)
       if (!address) {
         return [];
