@@ -1,4 +1,5 @@
 (() => {
+
   window.klaytn = klaytn = {
     autoRefreshOnNetworkChange: false,
     endpointURL: "https://public-en.klutchwallet.com/v1/baobab",
@@ -30,9 +31,9 @@
         })
     },
     enable: async function () {
-      const address = await window.favorlet.enable();
       const network = await window.favorlet.getNetwork();
-      console.log("enable return: ", address)
+      const address = await window.favorlet.enable();
+
       if (!address) {
         return [];
       }

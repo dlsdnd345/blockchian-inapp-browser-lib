@@ -10,7 +10,9 @@ import co.iw.inappbrowserlib.BridgeFavorlet
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding;
+    private lateinit var binding: ActivityMainBinding
+
+    private lateinit var webFragment: BlockchainInappBrowserFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,18 +32,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun initFragmentWeb(url: String) {
 
-        val webFragment = BlockchainInappBrowserFragment.newInstance(url = url)
-        webFragment.setWebViewBridgeListener(webViewBridgeListener)
+        webFragment = BlockchainInappBrowserFragment.newInstance(url = url)
         val fm = supportFragmentManager
         val ft = fm.beginTransaction()
         ft.replace(R.id.layoutWeb, webFragment)
         ft.commit()
-    }
-
-
-    private val webViewBridgeListener = object : BridgeFavorlet.IWebViewBridgeListener {
-        override fun webRequest(id: String, action: String, params: String) {
-            Log.i("TAG",">>> webRequest id : $id , action: $action, params : $params")
-        }
     }
 }

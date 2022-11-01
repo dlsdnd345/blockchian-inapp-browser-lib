@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Android Light Sensor Demo</title>
+<script language="javascript">
+
+  var port;
+
+  function clickText() {
+    //[Web] -> [Android]
+    port.postMessage("ping");
+  }
+
+  onmessage = function (event) {
+
+    if(event.data == 'favorlet') {
+
+        port = event.ports[0];
+        port.onmessage = function (e) {
+          console.log(">>> onmessage ::: " + e.data);
+        }
+    }
+  }
+
+</script>
+</head>
+<body>
+<p><b><a style="font-size: 4.0em;font-weight: bold;" onClick="clickText()">clickText !!!!!!!!!</a></b></p>
+</body>
+</html>
+

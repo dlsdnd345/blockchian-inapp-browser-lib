@@ -10,7 +10,7 @@ interface IBridge {
 
 
     @JavascriptInterface
-    fun getNetwork(): Number
+    fun getNetwork(): Int
 
     @JavascriptInterface
     fun enable(): String

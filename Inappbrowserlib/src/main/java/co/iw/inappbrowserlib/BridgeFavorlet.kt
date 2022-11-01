@@ -8,24 +8,8 @@ import android.webkit.WebView
 
 class BridgeFavorlet(val webView: WebView) : IBridge {
 
-    private var webViewBridgeListener: IWebViewBridgeListener? = null
-
-    /**
-     * WebViewBridgeManager -> WebFragment 로 이벤트 전달
-     */
-    interface IWebViewBridgeListener {
-        fun webRequest(id: String, action: String, params: String)
-    }
-
-    /**
-     * WebViewBridgeManager 리스너 세팅
-     */
-    fun setWebViewBridgeListener(listener: IWebViewBridgeListener) {
-        webViewBridgeListener = listener
-    }
-
     @JavascriptInterface
-    override fun getNetwork(): Number {
+    override fun getNetwork(): Int {
         return 1001
     }
 
@@ -43,7 +27,6 @@ class BridgeFavorlet(val webView: WebView) : IBridge {
 
     override fun webRequest(id: String, action: String, params: String) {
         Log.d("TAG",">>> webRequest, $id $action $params")
-        webViewBridgeListener?.webRequest(id, action, params)
     }
 
     override fun webRequestCallBack(id: String, action: String, callbackParams: String) {
