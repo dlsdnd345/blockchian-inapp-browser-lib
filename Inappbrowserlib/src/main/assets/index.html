@@ -16,6 +16,7 @@
 
         port = event.ports[0];
         port.onmessage = function (e) {
+        //[Android] -> [Web]
           console.log(">>> onmessage ::: " + e.data);
         }
     }

@@ -1,6 +1,5 @@
 package co.iw.inappbrowserlib
 
-import android.annotation.TargetApi
 import android.app.Activity
 import android.graphics.Color
 import android.net.Uri
@@ -22,7 +21,6 @@ import java.io.InputStream
 class BlockchainInappBrowserFragment : Fragment() {
 
     companion object {
-
         //초기화 함수
         fun newInstance(url: String): BlockchainInappBrowserFragment {
             val fragment = BlockchainInappBrowserFragment()
@@ -33,10 +31,22 @@ class BlockchainInappBrowserFragment : Fragment() {
         }
     }
 
-    private lateinit var activity: Activity
+    interface IWebViewBridgeListener {
+        fun onMessage(port: WebMessagePort, message: WebMessage)
+    }
+
     private lateinit var binding: FragmentBlockchainInappBrowserBinding
 
     private lateinit var webMessagePort: WebMessagePort
+    private var webViewBridgeListener: IWebViewBridgeListener? = null
+
+    /**
+     * WebViewBridgeManager 리스너 세팅
+     */
+    fun setWebViewBridgeListener(listener: IWebViewBridgeListener) {
+        webViewBridgeListener = listener
+    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentBlockchainInappBrowserBinding.inflate(inflater, container, false)
@@ -46,8 +56,6 @@ class BlockchainInappBrowserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        this.activity = getActivity() as Activity
-
         init()
     }
 
@@ -88,9 +96,9 @@ class BlockchainInappBrowserFragment : Fragment() {
             settings.loadsImagesAutomatically = true
             webViewClient = baseWebViewClient
             setWebContentsDebuggingEnabled(true)
-            addJavascriptInterface(BridgeFavorlet(this), "favorlet")
-            loadUrl(url)
-//            loadUrl("file:///android_asset/index.html")
+            //addJavascriptInterface(BridgeFavorlet(this), "favorlet")
+            //loadUrl(url)
+            loadUrl("file:///android_asset/index.html")
         }
     }
 
@@ -101,24 +109,18 @@ class BlockchainInappBrowserFragment : Fragment() {
     fun initWebMessagePort() {
         val channel = binding.webView.createWebMessageChannel()
         webMessagePort = channel[0]
-        webMessagePort.setWebMessageCallback(object : WebMessagePort.WebMessageCallback() {
-            override fun onMessage(port: WebMessagePort, message: WebMessage) {
-                Log.i("TAG",">>>>> [Web] -> [Android] onMessage : ${message}")
-                Log.i("TAG",">>>>> [Android] -> [Web] postMessage")
-                port.postMessage(WebMessage("10000"))
-            }
-        })
+        webMessagePort.setWebMessageCallback(webMessageCallback)
 
         binding.webView.postWebMessage(WebMessage("favorlet", arrayOf(channel[1])), Uri.EMPTY)
     }
 
 
     /*
-     * 자바스크립트 파일 주입
+     * Provider 자바스크립트 파일 주입
      */
     private fun injectJS(webView: WebView) {
         try {
-            val inputStream: InputStream = webView.context.assets.open("app-to-app-klaytn.js")
+            val inputStream: InputStream = webView.context.assets.open("klaytn-provider.js")
             val buffer = ByteArray(inputStream.available())
             inputStream.read(buffer)
             inputStream.close()
@@ -139,13 +141,17 @@ class BlockchainInappBrowserFragment : Fragment() {
 
 
     /*
+     * [Android] -> [Web] 메세지 전달
+     */
+    public fun postMessage(string: String) {
+        webMessagePort.postMessage(WebMessage(string))
+    }
+
+
+    /*
      * WebViewClient
      */
     private val baseWebViewClient = object : WebViewClient() {
-        override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-            view.loadUrl(url)
-            return true
-        }
 
         override fun onLoadResource(view: WebView, url: String) {
             super.onLoadResource(view, url)
@@ -155,6 +161,17 @@ class BlockchainInappBrowserFragment : Fragment() {
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             initWebMessagePort()
+        }
+    }
+
+
+    /**
+     * [Web] -> [Android] 메세지 전달
+     */
+    private val webMessageCallback = object : WebMessagePort.WebMessageCallback() {
+        override fun onMessage(port: WebMessagePort, message: WebMessage) {
+            Log.i("TAG",">>> onMessage : ${message.data}")
+            webViewBridgeListener?.onMessage(port, message)
         }
     }
 }

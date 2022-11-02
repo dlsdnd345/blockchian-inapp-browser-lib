@@ -11,8 +11,8 @@
         <EditText
             android:id="@+id/editUrl"
             android:layout_width="0dp"
-            android:text="http://stage.favorlet-js.testpage.s3-website.ap-northeast-2.amazonaws.com/"
             android:layout_height="wrap_content"
+            android:text="http://stage.favorlet-js.testpage.s3-website.ap-northeast-2.amazonaws.com/"
             app:layout_constraintEnd_toStartOf="@+id/btnSearch"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -26,12 +26,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:id="@+id/btnPostMessage"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="Pong!"
+            android:textSize="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnSearch" />
+
         <FrameLayout
             android:id="@+id/layoutWeb"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editUrl"/>
+            app:layout_constraintTop_toBottomOf="@+id/btnPostMessage" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
